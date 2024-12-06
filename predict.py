@@ -49,10 +49,12 @@ class Predictor:
         Returns:
             Preprocessed image array.
         """
+        print(image)
         if isinstance(image, str):  # File path
             pil_image = load_img(image, target_size=(self.input_size, self.input_size))
-        elif isinstance(image, bytes):  # Byte stream
-            pil_image = Image.open(io.BytesIO(image)).convert("RGB")
+        elif isinstance(image, Image.Image):  # Byte stream
+            # pil_image = Image.open(io.BytesIO(image)).convert("RGB")
+            pil_image = image.convert("RGB")
             pil_image = pil_image.resize((self.input_size, self.input_size))
         else:
             raise ValueError("Invalid image input type. Must be a file path or bytes.")
@@ -100,11 +102,12 @@ def launch_gradio_interface(predictor):
     # Define Gradio Interface
     interface = gr.Interface(
         fn=gradio_inference,
-        inputs=gr.Image(type="filepath", label="Upload an Image"),
+        inputs=gr.Image(type="pil", label="Upload an Image"),
         outputs="json",
         title="Fashion Apparel Images Classifier",
         description="Upload an image to classify it using the trained model.",
-        allow_flagging="never"  # Disable the flag button
+        allow_flagging="never",  # Disable the flag button
+        examples=["./images/test_image.jpg"]
     )
 
     # Launch the Gradio Interface
